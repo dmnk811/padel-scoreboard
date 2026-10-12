@@ -1,137 +1,412 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Padel Scoreboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; margin: 0; padding: 20px; }
-        .container { display: flex; justify-content: space-around; margin-top: 50px; }
-        .team { font-size: 2rem; background: #222; padding: 30px; border-radius: 15px; width: 40%; }
-        .score { font-size: 8rem; margin: 20px 0; color: #4CAF50; }
-        button { background: #4CAF50; color: white; border: none; padding: 15px 30px; font-size: 1.2rem; border-radius: 8px; cursor: pointer; margin-top: 20px; }
-        button:hover { background: #45a049; }
-        #status { margin-top: 15px; color: #aaa; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Padel Scoreboard 811</title>
+  <style>
+    :root {
+      --bg-color: #0d0d0d;
+      --card-default: #1e1e1e;
+      --text-color: #ffffff;
+      --accent-color: #2ecc71;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      overflow: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .scoreboard-container {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 1000px;
+      flex: 1;
+      margin: 10px 0;
+    }
+
+    @media (max-width: 600px) and (orientation: portrait) {
+      .scoreboard-container {
+        flex-direction: column;
+      }
+    }
+
+    .team-card {
+      position: relative;
+      flex: 1;
+      background-color: var(--card-default);
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .team-card-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .team-name-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      padding: 6px;
+      flex-grow: 1;
+      box-sizing: border-box;
+    }
+
+    .team-name-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .color-picker-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color-picker-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .color-select-hidden {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .sets-display {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #ddd;
+      margin-top: 5px;
+    }
+
+    .score-display {
+      font-size: clamp(5rem, 15vw, 10rem);
+      font-weight: 900;
+      color: var(--accent-color);
+      line-height: 1;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      user-select: none;
+      margin: auto 0;
+    }
+
+    .manual-controls {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      z-index: 2;
+    }
+
+    .btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex: 1;
+    }
+
+    .btn:active {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .btn-fullscreen {
+      background-color: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .btn-reset {
+      background-color: #e74c3c;
+    }
+
+    .btn-reset:active {
+      background-color: #c0392b;
+    }
+
+    footer {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 5px 0;
+    }
+
+    /* Farbschemata */
+    .bg-dark { background-color: #1e1e1e; }
+    .bg-blue { background-color: #1a365d; }
+    .bg-red { background-color: #5c1d1d; }
+    .bg-green { background-color: #1b4332; }
+    .bg-purple { background-color: #3c1361; }
+    .bg-yellow { background-color: #6a5310; }
+    .bg-orange { background-color: #652d0d; }
+  </style>
 </head>
 <body>
 
-    <h1>Padel Scoreboard (Bluetooth Remote)</h1>
-    <button id="connectBtn">Bluetooth Sender verbinden</button>
-    <div id="status">Nicht verbunden</div>
+  <header>
+    <h1>811 Padel</h1>
+    <div class="header-actions">
+      <button class="btn btn-fullscreen" onclick="toggleFullscreen()">Vollbild ⛶</button>
+    </div>
+  </header>
 
-    <div class="container">
-        <div class="team">
-            <h2>Team A</h2>
-            <div class="score" id="scoreA">0</div>
-            <div id="statusA" style="font-size: 1rem; color: #888;">Warte auf Sender...</div>
+  <div class="scoreboard-container">
+    <!-- TEAM A -->
+    <div class="team-card bg-dark" id="card-a" onclick="handleCardClick(event, 'a')">
+      <div class="team-card-header" onclick="event.stopPropagation()">
+        <input type="text" class="team-name-input" id="name-a" value="Team A" placeholder="Team A">
+        <div class="color-picker-wrapper" title="Farbe ändern">
+          <div class="color-picker-btn">🎨</div>
+          <select class="color-select-hidden" onchange="changeColor('card-a', this.value)">
+            <option value="bg-dark">Dunkelgrau</option>
+            <option value="bg-blue">Blau</option>
+            <option value="bg-red">Rot</option>
+            <option value="bg-green">Grün</option>
+            <option value="bg-yellow">Gelb</option>
+            <option value="bg-purple">Violett</option>
+            <option value="bg-orange">Orange</option>
+          </select>
         </div>
-        <div class="team">
-            <h2>Team B</h2>
-            <div class="score" id="scoreB">15</div>
-            <div id="statusB" style="font-size: 1rem; color: #888;">Warte auf Sender...</div>
-        </div>
+      </div>
+
+      <div class="sets-display">Sätze: <span id="sets-a">0</span></div>
+      <div class="score-display" id="score-a">0</div>
+
+      <div class="manual-controls" onclick="event.stopPropagation()">
+        <button class="btn" onclick="addPoint('a')">+1</button>
+        <button class="btn" onclick="undoPoint()">Rückgängig</button>
+      </div>
     </div>
 
-    <script>
-        let scoreA = 0;
-        let scoreB = 0;
-        let history = []; // Für Undo
+    <!-- TEAM B -->
+    <div class="team-card bg-dark" id="card-b" onclick="handleCardClick(event, 'b')">
+      <div class="team-card-header" onclick="event.stopPropagation()">
+        <input type="text" class="team-name-input" id="name-b" value="Team B" placeholder="Team B">
+        <div class="color-picker-wrapper" title="Farbe ändern">
+          <div class="color-picker-btn">🎨</div>
+          <select class="color-select-hidden" onchange="changeColor('card-b', this.value)">
+            <option value="bg-dark">Dunkelgrau</option>
+            <option value="bg-blue">Blau</option>
+            <option value="bg-red">Rot</option>
+            <option value="bg-green">Grün</option>
+            <option value="bg-yellow">Gelb</option>
+            <option value="bg-purple">Violett</option>
+            <option value="bg-orange">Orange</option>
+          </select>
+        </div>
+      </div>
 
-        // Speicher für die Geräte-Zuordnung: { deviceId: 'A' } oder 'B'
-        let devices = {};
-        
-        // Klick-Erkennungs-Timer pro Sender
-        let clickData = {};
+      <div class="sets-display">Sätze: <span id="sets-b">0</span></div>
+      <div class="score-display" id="score-b">0</div>
 
-        const connectBtn = document.getElementById('connectBtn');
-        const statusDiv = document.getElementById('status');
+      <div class="manual-controls" onclick="event.stopPropagation()">
+        <button class="btn" onclick="addPoint('b')">+1</button>
+        <button class="btn" onclick="undoPoint()">Rückgängig</button>
+      </div>
+    </div>
+  </div>
 
-        connectBtn.addEventListener('click', async () => {
-            try {
-                statusDiv.innerText = "Bitte Sender 1 (Team A) auswählen...";
-                const deviceA = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: ['generic_access', 'human_interface_device']
-                });
-                
-                devices[deviceA.id] = 'A';
-                document.getElementById('statusA').innerText = "Verbunden: " + deviceA.name;
+  <footer>
+    <button class="btn btn-reset" onclick="resetGame()">Spiel zurücksetzen</button>
+  </footer>
 
-                statusDiv.innerText = "Bitte Sender 2 (Team B) auswählen...";
-                const deviceB = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: ['generic_access', 'human_interface_device']
-                });
+  <script>
+    const pointsSequence = ["0", "15", "30", "40", "V"];
+    
+    let state = {
+      scoreA: 0,
+      scoreB: 0,
+      setsA: 0,
+      setsB: 0,
+      history: []
+    };
 
-                devices[deviceB.id] = 'B';
-                document.getElementById('statusB').innerText = "Verbunden: " + deviceB.name;
-                statusDiv.innerText = "Beide Sender erfolgreich verbunden!";
+    function updateDisplay() {
+      document.getElementById('score-a').innerText = pointsSequence[state.scoreA] || "40";
+      document.getElementById('score-b').innerText = pointsSequence[state.scoreB] || "40";
+      document.getElementById('sets-a').innerText = state.setsA;
+      document.getElementById('sets-b').innerText = state.setsB;
+    }
 
-                // Verbindung herstellen (Beispiel über HID / GATT falls direkt unterstützt)
-                // Hinweis: Da viele China-Fernbedienungen als Standard-Bluetooth-Tastatur (HID) gekoppelt werden, 
-                // greift alternativ der globale Tastendruck-Listener unten, falls Web Bluetooth das Gerät direkt blockiert.
-
-            } catch (error) {
-                console.error("Fehler bei Bluetooth-Verbindung:", error);
-                statusDiv.innerText = "Verbindung abgebrochen oder nicht unterstützt.";
-            }
-        });
-
-        // Fallback / Ergänzung für Android (Kopplung via Android Bluetooth-Einstellungen):
-        // Wenn die Fernbedienungen ganz normal als Bluetooth-Tastatur gekoppelt sind, 
-        // fängt das Betriebssystem die Signale ab. 
-        // Falls du exakte Unterscheidung per MAC willst, läuft das professionell über WebHID API:
-
-        /* 
-           WebHID API Integration für Bluetooth-Tastaturen:
-           navigator.hid.requestDevice({ filters: [] })... 
-           Dadurch liest der Browser direkt die Rohdaten der verbundenen USB/Bluetooth-HID-Devices aus 
-           und sieht, *welches* Gerät den Tastendruck gesendet hat.
-        */
-
-        function handleButtonPress(team) {
-            // Einfache Klick-Logik mit Doppelklick-Erkennung
-            let now = new Date().getTime();
-            if (!clickData[team]) {
-                clickData[team] = { count: 0, lastTime: 0 };
-            }
-
-            if (now - clickData[team].lastTime < 400) {
-                // Doppelklick erkannt -> Zurück (Undo)
-                clickData[team].count++;
-            } else {
-                clickData[team].count = 1;
-            }
-            clickData[team].lastTime = now;
-
-            setTimeout(() => {
-                if (clickData[team].count === 1) {
-                    // 1x Klicken: Punkt
-                    if (team === 'A') { scoreA++; history.push('A'); }
-                    if (team === 'B') { scoreB++; history.push('B'); }
-                } else if (clickData[team].count >= 2) {
-                    // 2x Klicken: Zurück
-                    let lastTeam = history.pop();
-                    if (lastTeam === 'A' && scoreA > 0) scoreA--;
-                    if (lastTeam === 'B' && scoreB > 0) scoreB--;
-                }
-                clickData[team].count = 0;
-                updateDisplay();
-            }, 400);
+    function addPoint(team) {
+      saveState();
+      if (team === 'a') {
+        if (state.scoreA === 3 && state.scoreB === 3) {
+          state.scoreA = 4;
+        } else if (state.scoreB === 4) {
+          state.scoreB = 3;
+        } else if (state.scoreA >= 3 && state.scoreB < 3) {
+          winGame('a');
+          return;
+        } else if (state.scoreA === 4) {
+          winGame('a');
+          return;
+        } else {
+          state.scoreA++;
         }
-
-        function updateDisplay() {
-            document.getElementById('scoreA').innerText = scoreA;
-            document.getElementById('scoreB').innerText = scoreB;
+      } else if (team === 'b') {
+        if (state.scoreA === 3 && state.scoreB === 3) {
+          state.scoreB = 4;
+        } else if (state.scoreA === 4) {
+          state.scoreA = 3;
+        } else if (state.scoreB >= 3 && state.scoreA < 3) {
+          winGame('b');
+          return;
+        } else if (state.scoreB === 4) {
+          winGame('b');
+          return;
+        } else {
+          state.scoreB++;
         }
+      }
+      updateDisplay();
+    }
 
-        // Tastatur-Lauscher (greift, sobald die Fernbedienungen als HID-Tastatur verbunden sind)
-        window.addEventListener('keydown', (e) => {
-            // Beispiel: Wenn Sender A z.B. 'PageUp' und Sender B 'PageDown' sendet (oder über WebHID ausgelesen)
-            if (e.key === 'PageUp') { handleButtonPress('A'); }
-            if (e.key === 'PageDown') { handleButtonPress('B'); }
+    function winGame(team) {
+      if (team === 'a') state.setsA++;
+      else state.setsB++;
+      
+      state.scoreA = 0;
+      state.scoreB = 0;
+      updateDisplay();
+    }
+
+    function undoPoint() {
+      if (state.history.length > 0) {
+        const lastState = state.history.pop();
+        state.scoreA = lastState.scoreA;
+        state.scoreB = lastState.scoreB;
+        state.setsA = lastState.setsA;
+        state.setsB = lastState.setsB;
+        updateDisplay();
+      }
+    }
+
+    function saveState() {
+      state.history.push({
+        scoreA: state.scoreA,
+        scoreB: state.scoreB,
+        setsA: state.setsA,
+        setsB: state.setsB
+      });
+    }
+
+    function resetGame() {
+      if (confirm("Möchtest du das aktuelle Spiel wirklich zurücksetzen?")) {
+        state.scoreA = 0;
+        state.scoreB = 0;
+        state.setsA = 0;
+        state.setsB = 0;
+        state.history = [];
+        updateDisplay();
+      }
+    }
+
+    function changeColor(cardId, colorClass) {
+      const card = document.getElementById(cardId);
+      card.className = "team-card " + colorClass;
+    }
+
+    function handleCardClick(event, team) {
+      addPoint(team);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch((err) => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
         });
-    </script>
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+
+      if (e.key === 'PageUp' || e.key === 'ArrowUp' || e.key === 'VolumeUp') {
+        addPoint('a');
+      } else if (e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'VolumeDown') {
+        addPoint('b');
+      } else if (e.key === 'Backspace' || e.key === 'u') {
+        undoPoint();
+      }
+    });
+
+    updateDisplay();
+  </script>
 </body>
 </html>
