@@ -206,6 +206,16 @@
       transform: scale(0.97);
     }
 
+    .btn-bluetooth {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    .btn-bluetooth:hover {
+      background: rgba(16, 185, 129, 0.25);
+    }
+
     .btn-fullscreen {
       background: rgba(255, 255, 255, 0.05);
     }
@@ -244,6 +254,7 @@
   <header>
     <h1>Padel-Scorepad</h1>
     <div class="header-actions">
+      <button class="btn btn-bluetooth" id="bt-connect-btn" onclick="connectBluetoothDevice()">Sender verbinden 📶</button>
       <button class="btn btn-fullscreen" onclick="toggleFullscreen()">Vollbild ⛶</button>
     </div>
   </header>
@@ -375,66 +386,4 @@
         state.scoreA = lastState.scoreA;
         state.scoreB = lastState.scoreB;
         state.setsA = lastState.setsA;
-        state.setsB = lastState.setsB;
-        updateDisplay();
-      }
-    }
-
-    function saveState() {
-      state.history.push({
-        scoreA: state.scoreA,
-        scoreB: state.scoreB,
-        setsA: state.setsA,
-        setsB: state.setsB
-      });
-    }
-
-    function resetGame() {
-      if (confirm("Möchtest du das aktuelle Spiel wirklich zurücksetzen?")) {
-        state.scoreA = 0;
-        state.scoreB = 0;
-        state.setsA = 0;
-        state.setsB = 0;
-        state.history = [];
-        updateDisplay();
-      }
-    }
-
-    function changeColor(cardId, colorClass) {
-      const card = document.getElementById(cardId);
-      // Entferne alte Farbklassen und setze die neue
-      card.className = "team-card " + colorClass;
-    }
-
-    function handleCardClick(event, team) {
-      addPoint(team);
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch((err) => {
-          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
-        });
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT') return;
-
-      if (e.key === 'PageUp' || e.key === 'ArrowUp' || e.key === 'VolumeUp') {
-        addPoint('a');
-      } else if (e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'VolumeDown') {
-        addPoint('b');
-      } else if (e.key === 'Backspace' || e.key === 'u') {
-        undoPoint();
-      }
-    });
-
-    updateDisplay();
-  </script>
-</body>
-</html>
+        state.sets
