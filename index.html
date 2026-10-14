@@ -10,7 +10,6 @@
       --card-default: #161e2e;
       --text-color: #f8fafc;
       --accent-color: #10b981;
-      --accent-hover: #059669;
       --border-color: rgba(255, 255, 255, 0.08);
     }
 
@@ -40,7 +39,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
+      padding: 10px 16px;
       background: rgba(22, 30, 46, 0.6);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border-color);
@@ -50,17 +49,12 @@
 
     h1 {
       margin: 0;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 700;
       letter-spacing: 0.5px;
       background: linear-gradient(135deg, #f8fafc, #94a3b8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
     }
 
     .scoreboard-container {
@@ -90,7 +84,6 @@
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      transition: background-color 0.3s ease, border-color 0.3s ease;
       cursor: pointer;
     }
 
@@ -140,11 +133,6 @@
       align-items: center;
       justify-content: center;
       font-size: 1.1rem;
-      transition: background 0.2s;
-    }
-
-    .color-picker-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
     }
 
     .color-select-hidden {
@@ -206,20 +194,6 @@
       transform: scale(0.97);
     }
 
-    .btn-bluetooth {
-      background: rgba(16, 185, 129, 0.15);
-      border-color: rgba(16, 185, 129, 0.3);
-      color: #34d399;
-    }
-
-    .btn-bluetooth:hover {
-      background: rgba(16, 185, 129, 0.25);
-    }
-
-    .btn-fullscreen {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
     .btn-reset {
       background-color: rgba(239, 68, 68, 0.15);
       border-color: rgba(239, 68, 68, 0.3);
@@ -239,7 +213,7 @@
       padding: 5px 0;
     }
 
-    /* Veredelte Team-Farbschemata */
+    /* Team-Farbschemata */
     .bg-dark { background-color: #161e2e; }
     .bg-blue { background-color: #172554; border-color: rgba(59, 130, 246, 0.3); }
     .bg-red { background-color: #451a03; border-color: rgba(239, 68, 68, 0.3); }
@@ -253,10 +227,6 @@
 
   <header>
     <h1>Padel-Scorepad</h1>
-    <div class="header-actions">
-      <button class="btn btn-bluetooth" id="bt-connect-btn" onclick="connectBluetoothDevice()">Sender verbinden 📶</button>
-      <button class="btn btn-fullscreen" onclick="toggleFullscreen()">Vollbild ⛶</button>
-    </div>
   </header>
 
   <div class="scoreboard-container">
@@ -386,4 +356,54 @@
         state.scoreA = lastState.scoreA;
         state.scoreB = lastState.scoreB;
         state.setsA = lastState.setsA;
-        state.sets
+        state.setsB = lastState.setsB;
+        updateDisplay();
+      }
+    }
+
+    function saveState() {
+      state.history.push({
+        scoreA: state.scoreA,
+        scoreB: state.scoreB,
+        setsA: state.setsA,
+        setsB: state.setsB
+      });
+    }
+
+    function resetGame() {
+      if (confirm("Möchtest du das aktuelle Spiel wirklich zurücksetzen?")) {
+        state.scoreA = 0;
+        state.scoreB = 0;
+        state.setsA = 0;
+        state.setsB = 0;
+        state.history = [];
+        updateDisplay();
+      }
+    }
+
+    function changeColor(cardId, colorClass) {
+      const card = document.getElementById(cardId);
+      card.className = "team-card " + colorClass;
+    }
+
+    function handleCardClick(event, team) {
+      addPoint(team);
+    }
+
+    // Listener für Tastatureingaben & Bluetooth-Auslöser
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+
+      if (e.key === 'PageUp' || e.key === 'ArrowUp' || e.key === 'VolumeUp') {
+        addPoint('a');
+      } else if (e.key === 'PageDown' || e.key === 'ArrowDown' || e.key === 'VolumeDown') {
+        addPoint('b');
+      } else if (e.key === 'Backspace' || e.key === 'u') {
+        undoPoint();
+      }
+    });
+
+    updateDisplay();
+  </script>
+</body>
+</html>
